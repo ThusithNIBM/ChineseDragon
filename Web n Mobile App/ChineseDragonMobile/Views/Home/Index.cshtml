@@ -1,0 +1,110 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>kitchen</h2>
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="row">
+
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Example</h3>
+                </div>
+                <!-- /.card-header -->
+                <!-- form start -->
+                <form id="formOrderCreate">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Item</label>
+                            <select class="form-control select2" style="width: 100%;" id="comboMItem">
+                                @foreach (var menuitem in ViewBag.menuiems)
+                                {
+                                    <option value="@menuitem.ID">@menuitem.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Qty</label>
+                            <input type="text" class="form-control" id="itemQty" placeholder="Qty">
+                        </div>
+
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary" onclick="addMnuItem()">Add</button>
+                        </div>
+                        <br />
+                        <div id="divAddedMenuItems">
+                            <ul>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="col-md-4">
+
+    </div>
+    <div class="col-md-4">
+
+    </div>
+</div>
+
+@section scripts{
+    <script>
+    $(document).on('click', '.btn-status-change', function () {
+        $.ajax({
+            type: 'POST',
+            url: '/Home/UpdateKitchenWFBtn',
+            data: {
+                id: $(this).data("orderhid"),
+                status: $(this).data("orderstatus")
+            },
+            success: function (jsondata) {
+                if (jsondata.IsSuccess) {
+                    location.reload();
+                }
+            }
+        });
+    });
+
+    orderItems = [];
+    $(document).on('submit', '#formOrderCreate', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: '/Home/CreateOrder',
+            data: {
+                OrderType: 'T',
+                OrderThrough:'M' ,
+                OrderUser:'4267',
+                OrderStatus:'1',
+                OrderItems: orderItems
+            },
+            success: function (jsondata) {
+                if (jsondata.IsSuccess) {
+                    location.reload();
+                }
+            }
+        });
+    });
+
+    function addMnuItem() {
+        orderItems.push({ Qty: $('#itemQty').val(), MenuItemID: $('#comboMItem').val() });
+        console.log(orderItems);
+        $('#divAddedMenuItems ul').append('<li>' + $('#comboMItem option:selected').text() + ' - ' + $('#itemQty').val() + ' </li>');
+    }
+    </script>
+}
